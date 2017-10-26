@@ -12,6 +12,37 @@ namespace OdeToFood.Services
         IEnumerable<Restaurant> GetAll();
         Restaurant Get(int id);
         Restaurant Add(Restaurant newRestaurant);
+        void Commit();
+    }
+    public class SQLRestaurantData : IRestaurantData
+    {
+        private OdeToFoodDbContext _context;
+
+        public SQLRestaurantData(OdeToFoodDbContext context)
+        {
+            _context = context;
+        }
+        public Restaurant Add(Restaurant newRestaurant)
+        {
+            _context.Add(newRestaurant);
+            
+            return newRestaurant;
+        }
+
+        public void Commit()
+        {
+            _context.SaveChanges();
+        }
+
+        public Restaurant Get(int id)
+        {
+            return _context.Restaurants.FirstOrDefault(r => r.Id == id);
+        }
+
+        public IEnumerable<Restaurant> GetAll()
+        {
+            return _context.Restaurants;
+        }
     }
     public class InMemoryRestaurantData : IRestaurantData
     {
@@ -40,6 +71,11 @@ namespace OdeToFood.Services
             _restaurants.Add(newRestaurant);
 
             return newRestaurant;
+        }
+
+        public void Commit()
+        {
+            //... no op
         }
 
         static List<Restaurant> _restaurants;
